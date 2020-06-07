@@ -69,7 +69,7 @@ class Risk(Resource):
 
             if place_id is not None:
                 # make a request to Google Places API
-                place_json = requests.get('https://maps.googleapis.com/maps/api/place/details/json?place_id=' + place_id + '&fields=name,type,formatted_address,formatted_phone_number&key=' + GOOGLE_PLACES_API_KEY)
+                place_json = requests.get('https://maps.googleapis.com/maps/api/place/details/json?place_id=' + place_id + '&fields=name,type,formatted_address,address_component,formatted_phone_number&key=' + GOOGLE_PLACES_API_KEY)
                 place = place_json.json()
 
                 if place.get('status') == 'OK':
@@ -78,6 +78,17 @@ class Risk(Resource):
 
                     # the destination address
                     destination = place['result'].get('formatted_address')
+
+                    # TODO: get the destination zip code
+                    dest_address_components = place['result'].get('address_components')
+                    destination_zip_code = None
+
+                    for component in dest_address_components:
+                        types = component.get('types')
+                        if "postal_code" in types:
+                            destination_zip_code = component.get('long_name')
+
+                    # TODO: we get postal code from address components
 
                     # make the origin lat, lng string
                     origin = str(origin_obj.get('lat')) + ',' + str(origin_obj.get('lng'))
@@ -92,12 +103,14 @@ class Risk(Resource):
                     # print(directions_result)
 
                     legs = directions_result[0].get('legs')[0]  # assume this is one-leg trip
+
                     duration = legs.get('duration')
                     travel_time = duration.get('value')  # in seconds
 
                     # assemble model
                     for_model = {
                         "origin_zip_code": zip_code, # TODO: convert zip code to int ?
+                        "destination_zip_code": destination_zip_code,
                         "transport_type": transport_type,
                         "trip_duration": travel_time,
                         "risk_factors": person.get('conditions'),
