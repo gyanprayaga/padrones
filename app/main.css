@@ -1,0 +1,207 @@
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.container {
+  padding: 15px 0px;
+}
+
+.page-container {
+  width: 80%;
+  max-width: 1000px;
+  margin: auto;
+  margin-top: 4vw;
+}
+
+h1 {
+  padding-bottom: 5px;
+  border-bottom: 4px solid #c7ea02;
+  width: fit-content;
+  font-weight: 900;
+  font-size: 1.8em;
+}
+
+.location-container h3 {
+  display: inline;
+  vertical-align: text-top;
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.summary-container {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid lightGray;
+  display: inline-block;
+  width: 100%;
+  padding: 15px;
+  box-shadow: 0 0 6px 0px #ececec;
+}
+
+.summary-container div {
+  display: inline-block;
+  margin-right: 40px;
+}
+
+.summary-container div:last-child {
+  margin-right: 0px;
+}
+
+.summary-container .field-label {
+  font-size: 0.8em;
+  color: darkGray;
+  font-weight: 600;
+  display: block;
+  width: fit-content;
+  margin-bottom: 2px;
+  border-bottom: 1px solid darkGray;
+}
+
+.summary-container button {
+  float: right;
+}
+
+.container button.next {
+  display: block;
+  margin-top: 30px;
+  font-size: 16px;
+}
+
+.container button.submit {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.summary-container .field-value {
+  text-transform: capitalize;
+  display: block;
+}
+
+.outing-container {
+  font-size: 1.2em;
+}
+
+input[type=text], select, .pac-target-input {
+  font-family: inherit;
+  max-width: 500px;
+  font-size: inherit;
+  resize: none;
+  border: none;
+  outline: none;
+  margin: 0;
+  padding: 5px 5px;
+  border: 1px solid lightGray;
+  border-radius: 5px;
+  box-shadow: 0 0 6px 0px #ececec;
+  height: 40px;
+}
+
+.outing-container input[type=text] {
+  padding: 0 5px;
+  margin: 0 5px;
+  width: 30%;
+}
+
+.outing-container select {
+  margin: 0 5px;
+}
+
+.outing-container input:focus {
+  border: 1px solid darkGray;
+  box-shadow: 0 0 4px 0px #ececec;
+}
+
+.search-container input:focus {
+  border-bottom: 2px solid lightGray;
+}
+
+button.primary {
+  outline: none;
+  padding: 10px 20px;
+  font-family: inherit;
+  background: dodgerblue;
+  color: white;
+  font-size: 1em;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  transition: 0.2s all ease;
+}
+
+button.primary:hover {
+  padding: 10px 30px;
+  background: blue;
+}
+
+button.secondary {
+  padding: 7px 10px;
+  background: transparent;
+  color: #0f52d0;
+  border-radius: 50px;
+  border: 2px solid #0f52d0;
+  font-size: 0.8em;
+  font-weight: 600;
+  margin: 0;
+}
+
+button.secondary:hover {
+  border: 2px solid #09307b;
+  color: #09307b;
+}
+
+.checkboxes {
+  margin: 15px 0;
+  line-height: 160%;
+  font-weight: 500;
+}
+
+.pac-container {
+  box-shadow: none;
+  font-family: inherit;
+  border-radius: 5px;
+  border-top: none;
+  border: 1px solid lightGray;
+  margin-top: 5px;
+}
+
+.pac-container .pac-item {
+  background: transparent;
+  font-size: 0.9em !important;
+  padding: 5px 5px;
+}
+
+.pac-container .pac-item .pac-icon {
+  display: none;
+}
+
+.animated.fastest {
+  -webkit-animation-duration: 0.2s;
+  animation-duration: 0.2s;
+}
+
+.form-block {
+  display: inline;
+}
+
+.risk-level {
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 600;
+}
+
+.risk-level.red {
+  background-color: #e24931;
+}
+.risk-level.orange {
+  background-color: #f39a11;
+}
