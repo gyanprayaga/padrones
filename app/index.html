@@ -9,20 +9,17 @@
     <script src="https://kit.fontawesome.com/edb2f9c366.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
   <div id="app">
     <div class="page-container">
       <h1>COVID-19 Risk Calculator</h1>
-      <section v-if="geolocation">
+      <section v-if="!geolocation">
         <div class="container location-container" v-if="!outingDetails">
           <h3>
             Please share your current location to begin.
           </h3>
-          <button type="button" name="button" class="secondary location" onclick="getLocation()">
-            <i v-if="geolocation" class="fa fa-check" aria-hidden="true"></i>
-            <i v-else class="fa fa-crosshairs" aria-hidden="true"></i>
-            <span v-if="geolocation">Location shared</span>
-            <span v-else>Share location</span>
+          <button type="button" v-show="!geolocation" name="button" class="secondary location" onclick="getLocation()">
+            <span v-if="!loading"><i class="fa fa-crosshairs" aria-hidden="true"></i> Share location</span>
+            <span v-else><i class="fa fa-spinner" aria-hidden="true"></i> Loading...</span>
           </button>
         </div>
       </section>
@@ -43,23 +40,55 @@
             </span>
           </h3>
         </div>
-
         <div class="container outing-container" v-if="displayOuting">
-          <span class="outing">
-            I would like to
-            <select v-model="outing.transport">
-              <option v-for="option in static.transport" v-bind:value="option.value">
+          <div class="question-container">
+            <span class="question">
+              Where would you like to go?
+            </span>
+            <input id="autocomplete" autofocus type="text" placeholder="Griffith Park"/>
+          </div>
+          <div class="question-container" v-if="outing.place_id">
+            <span class="question">
+              How will you get there?
+            </span>
+            <button type="button" name="button" v-on:click="outing.transport = 'driving'" class="select-option" :class="outing.transport == 'driving' ? 'active' : ''">
+                <i class="fa fa-car" aria-hidden="true"></i> Driving
+            </button>
+            <button type="button" name="button" v-on:click="outing.transport = 'walking'" class="select-option" :class="outing.transport == 'walking' ? 'active' : ''">
+                <i class='fas fa-walking' aria-hidden="true"></i> Walking
+            </button>
+            <button type="button" name="button" v-on:click="outing.transport = 'bicycling'" class="select-option" :class="outing.transport == 'bicycling' ? 'active' : ''">
+                <i class="fa fa-bicycle" aria-hidden="true"></i> Biking
+            </button>
+            <button type="button" name="button" v-on:click="outing.transport = 'transit'" class="select-option" :class="outing.transport == 'transit' ? 'active' : ''">
+                <i class="fa fa-subway" aria-hidden="true"></i> Public Transit
+            </button>
+          </div>
+          <div class="question-container" v-if="outing.transport">
+            <span class="question">
+              What do you plan to do there?
+            </span>
+            <button type="button" name="button" v-on:click="activityType = 'indoor'; outing.activity = '';" class="select-option" :class="activityType == 'indoor' ? 'active' : ''">
+                <i class="fa fa-home" aria-hidden="true"></i> Indoor Activity
+            </button>
+            <button type="button" name="button" v-on:click="activityType = 'outdoor'; outing.activity = '';" class="select-option" :class="activityType == 'outdoor' ? 'active' : ''">
+                <i class="fas fa-umbrella-beach" aria-hidden="true"></i> Outdoor Activity
+            </button>
+          </div>
+          <div class="question-container" v-if="activityType">
+            <select v-model="outing.activity" v-if="activityType == 'indoor'">
+              <option disabled value="">Choose an indoor activity</option>
+              <option v-for="option in static.activities.indoor" v-bind:value="option.value">
                 {{ option.text }}
               </option>
             </select>
-            to
-            <select v-model="outing.activity">
-              <option v-for="option in static.activities" v-bind:value="option.value">
+            <select v-model="outing.activity" v-if="activityType == 'outdoor'">
+              <option disabled value="">Choose an outdoor activity</option>
+              <option v-for="option in static.activities.outdoor" v-bind:value="option.value">
                 {{ option.text }}
               </option>
             </select>
-            at
-            <input id="autocomplete" type="text" placeholder="Griffith Park" />
+          </div>
           </span>
 
           <transition
@@ -67,30 +96,45 @@
             enter-active-class="animated zoomIn fastest"
             leave-active-class="animated zoomOut fastest"
           >
-            <button type="button" name="button" v-on:click="submitOuting" v-if="outing.place_id" class="primary next">
+            <button type="button" name="button" v-on:click="submitOuting" v-if="displayOuting && outing.activity" class="primary next">
               Next <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button>
           </transition>
         </div>
-
-        <div class="container summary-container" v-show="outingDetails">
-          <div><span class="field-label">Transport:</span><span class="field-value">{{ outing.transport }}</span></div>
-          <div><span class="field-label">Activity:</span><span class="field-value">{{ outing.activity }}</span></div>
-          <div><span class="field-label">Destination:</span><span class="field-value">{{ outing.place_name }}</span></div>
-          <div v-show="personDetails"><span class="field-label">Age Group:</span><span class="field-value">{{ person.age }}</span></div>
-          <div v-show="personDetails">
-            <span class="field-label">Health Conditions:</span>
-            <span v-if="person.conditions.length > 0" class="field-value">{{ person.conditions.join(', ') }}</span>
-            <span v-else class="field-value">none</span>
+        <div class="container summary-container card" v-show="outingDetails">
+          <button type="button" name="button" class="secondary edit" v-on:click="editOuting">
+            <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+          </button>
+          <div class="group-container">
+            <div><span class="field-label">Destination:</span><span class="field-value">{{ outing.place_name }}</span></div>
+            <div><span class="field-label">Transport:</span><span class="field-value">{{ outing.transport }}</span></div>
+            <div><span class="field-label">Activity:</span><span class="field-value activity">{{ activityName }}</span></div>
           </div>
-          <button type="button" name="button" class="secondary" v-on:click="editOuting">Edit</button>
+          <div class="group-container" v-show="personDetails">
+            <div><span class="field-label">Age Group:</span><span class="field-value">{{ person.age_group }}</span></div>
+            <div>
+              <span class="field-label">Health Conditions:</span>
+              <span v-if="person.conditions.length > 0" class="field-value" style="display: block" v-for="condition in person.conditions">{{ condition }}</span>
+              <span v-if="!person.conditions.length" class="field-value">none</span>
+            </div>
+          </div v-show="personDetails">
         </div>
-
         <div class="container person-container" v-if="displayPerson">
-          <div class="form-block">
-            <h4>
-              Select any pre-existing conditions:
-            </h4>
+          <div class="question-container">
+            <span class="question">
+              What is your age group?
+            </span>
+            <select v-model="person.age_group">
+              <option disabled value="">Choose an age group</option>
+              <option v-for="option in static.ages" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+          </div>
+          <div class="question-container" v-if="person.age_group">
+            <span class="question">
+              Do you have any health conditions?
+            </span>
             <div class="checkboxes">
               <div class="checkbox" v-for="option in static.conditions">
                 <input type="checkbox" v-model="person.conditions" :value="option.value" name="option.value">
@@ -98,48 +142,38 @@
               </div>
             </div>
           </div>
-          <div class="form-block">
-            <h4>
-              Enter your age group:
-            </h4>
-            <select v-model="person.age">
-              <option v-for="option in static.ages" v-bind:value="option.value">
-                {{ option.text }}
-              </option>
-            </select>
-          </div>
           <transition
             name="custom-classes-transition"
             enter-active-class="animated zoomIn fastest"
             leave-active-class="animated zoomOut fastest"
           >
-            <button type="button" name="button" v-on:click="submitPerson" v-if="displayPerson" class="primary next">
+            <button type="button" name="button" v-on:click="submitPerson" v-if="displayPerson && person.age_group" class="primary next">
               Next <i class="fa fa-arrow-right" aria-hidden="true"></i>
             </button>
           </transition>
         </div>
-
         <div class="container submit-container" v-show="outingDetails && personDetails && !editing && !displayReport">
           <button type="button" name="button" class="primary next submit" v-on:click="calculateRisk">
             Calculate COVID-19 risk <i class="fas fa-virus"></i>
           </button>
         </div>
+        <div class="container report-container card" v-if="displayReport && !editing">
+          <h2>Your risk is <span class="risk-level" :class="riskLevel.number">{{ riskLevel.name }}</span></h2>
+          <div class="recommendation">
 
-        <div class="container report-container" v-if="displayReport">
-          <h2>Your risk is <span class="risk-level" :class="riskIndex.color">{{ riskIndex.name }}</span></h2>
-          <span>
-            We don’t recommend you participate in this activity.
-            This is because this is a high-contact activity, a high-contact venue, and you are vulnerable individual.
-            Try something else
+            <ul>
+              <li v-for="flag in flags">
+                {{ flag }}
+              </li>
+            </ul>
+
+            <div class="tip">
+              <span class="tip-label"><i class="fas fa-lightbulb"></i> Transportation Tip</span>
+              {{ activeTip }}
+            </div>
           </span>
         </div>
       </section>
-
-
-
-      <!-- <h5>Place ID = {{ outing.place_id }}</h5> -->
-
-
     </div>
   </div>
 
@@ -147,7 +181,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="main.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACLuoDomujgtH1FgRDALg_eUDdwqDr1cg&libraries=places&callback=initAutocomplete" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACLuoDomujgtH1FgRDALg_eUDdwqDr1cg&libraries=places" async defer></script>
 
 
 </body>
