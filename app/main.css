@@ -15,6 +15,10 @@ button {
   position: relative;
 }
 
+button, a {
+  cursor: pointer;
+}
+
 button.primary:active {
   top: 2px;
 }
@@ -135,7 +139,6 @@ h1 {
   margin-right: 10px;
   padding: 10px 15px;
   border-radius: 5px;
-  outline: none;
   font-family: inherit;
   font-weight: 600;
   font-size: 1em;

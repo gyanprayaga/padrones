@@ -16,7 +16,7 @@ var app = new Vue({
         ],
         driving: [
           'If you\'re using ride sharing, for the driver\'s safety, don\'t ride if you feel sick. Even if you\'re healthy, sit in the back to keep some distance between you and the driver. Wash your hands as soon as you can after your ride.',
-          'When you drive, you’ll need to refuel. That means you\'ll have to use gas pumps and credit card keypads that other people have touched.',
+          'When you drive, you’ll need to refuel. That means you\'ll have to use gas pumps and credit card keypads that other people have touched. Try to wash your hands or use an alcohol-based hand sanitizer',
           'To protect yourself, carry a pair of disposable gloves in your car. Put them on before you pay or pump gas. Or use a disinfecting wipe to clean off the pump handle and keypad. After you finish pumping gas, wash your hands or use an alcohol-based hand sanitizer.'
         ],
         bicycling: [
