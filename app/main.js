@@ -160,7 +160,7 @@ var app = new Vue({
       outing: this.outing,
       person: this.person
     }
-    axios.post('https://3922c042224a.ngrok.io/Risk', data,
+    axios.post('https://covid-risk-api-3bz32takqa-uw.a.run.app/Risk', data,
       {
         headers: {
           "Authorization": 'romkey_eats_padrones_123'
