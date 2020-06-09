@@ -107,8 +107,21 @@ class Risk(Resource):
                     duration = legs.get('duration')
                     travel_time = duration.get('value')  # in seconds
 
+                    #
+                    # Calculate the Risk
+                    #
+                    # Weighting system (for reference)
+                    # weights = {
+                    #     'transport': 10,
+                    #     'neighborhood': 20,
+                    #     'activity': 30,
+                    #     'persona': 40,
+                    # }
+
+                    # get my neighborhood
+                    
                     # assemble model
-                    for_model = {
+                    risk_factors = {
                         "origin_zip_code": zip_code, # TODO: convert zip code to int ?
                         "destination_zip_code": destination_zip_code,
                         "transport_type": transport_type,
@@ -116,6 +129,90 @@ class Risk(Resource):
                         "risk_factors": person.get('conditions'),
                         "age_group": person.get('age_group')
                     }
+
+                    my_neighborhood = get_csv_and_extract_code_from_zip_code(PAPA_CSV)
+
+                    neighborhood_risk_pts = {
+                        'Very high risk': 20,
+                        'High risk': 15,
+                        'Medium risk': 10,
+                        'Low risk': 5
+                    }
+
+                    personal_risk_pts = {
+                        age: {
+                            '0-30': 0,
+                            '31-50': 2,
+                            '51-64': 5,
+                            '65+': 10
+                        },
+                        conditions: {
+                            'diabetes': 10,
+                            'hypertension': 10
+                            'heart_or_lung_disease': 10
+                        }
+                    }
+
+                    transport_risk_pts = {
+                        'driving': 2,
+                        'bicycling': 2,
+                        'walking': 2,
+                        'transit': 10
+                    }
+
+                    activities_risk_pts = {
+                        'walking': 0,
+                        'running': 0,
+                        'high_contact_sport': 18,
+                        'low_contact_sport': 6,
+                        'park': 6,
+                        'barbecue': 6,
+                        'restaurant_outdoor': 8,
+                        'crowded_outdoor': 12,
+                        'playground': 18,
+                        'swimming': 21,
+                        'shopping': 15,
+                        'grocery': 9,
+                        'worship_center': 24,
+                        'hair_salon': 18,
+                        'library': 8,
+                        'museum': 8,
+                        'dinner_party': 12,
+                        'restaurant_indoor': 15,
+                        'bar': 30,
+                        'doctor': 12,
+                        'crowded_indoor': 28
+                    }
+
+
+
+
+                    # TODO: Things to respond:
+                    # 1: Top three factors (not neighborhood)
+                    # 2: Flag if the person is within 5% of the max
+
+                    risk_score = neighborhood_risk_pts[MODEL_RISK] + personal_risk_pts[age_band]
+
+                    # TODO: make sure no errors if doesn't exist in index
+
+                    for conditions in conditions
+
+                    # TODO: create object with array of flags on response
+
+
+
+
+                    # to calculate, just divide / 100
+
+
+
+
+
+
+
+
+
+
 
                     return {'feed_to_model': for_model}
                 else:
